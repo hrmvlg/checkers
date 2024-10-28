@@ -1,0 +1,18 @@
+.piece {
+    border-radius: 50px;
+    width: 90%;
+    height: 90%;
+
+    &.white {
+        background-color: #fff;
+        border: 1px solid #000;
+    }
+
+    &.black {
+        background-color: #000;
+    }
+
+    &.king {
+        border: 1px solid #fc7f49;
+    }
+}
