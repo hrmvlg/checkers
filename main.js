@@ -115,7 +115,34 @@ function canMoveRegular(piece, startRow, startCol, endRow, endCol, direction) {
 }
 
 function canMoveKing(piece, startRow, startCol, endRow, endCol) {
+  if (Math.abs(endRow - startRow) === Math.abs(endCol - startCol)) {
+    let pathClear = true;
+    let middlePieceCaptured = false;
 
+    const rowStep = endRow > startRow ? 1 : -1;
+    const colStep = endCol > startCol ? 1 : -1;
+
+    for (let i = 1; i < Math.abs(endRow - startRow); i++) {
+      const intermediateCell = document.querySelector(`.cell[data-row="${startRow + i * rowStep}"][data-col="${startCol + i * colStep}"]`);
+      const pieceOnPath = intermediateCell.querySelector(".piece");
+
+      if (pieceOnPath) {
+        if (pieceOnPath.dataset.color != piece.dataset.color) {
+          if (middlePieceCaptured) {
+            pathClear = false;
+            break;
+          } else {
+            middlePieceCaptured = true;
+          }
+        } else {
+          pathClear = false;
+          break;
+        }
+      }
+    }
+    if (pathClear) return true;
+  }
+  return false;
 }
 
 function movePiece(piece, targetCell) {
