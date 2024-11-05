@@ -216,7 +216,7 @@ function hasValidMoves(piece) {
 
       if (isValidPosition(jumpRow, jumpCol)) {
         const middleCell = document.querySelector(`.cell[data-row="${newRow}"][data-col="${newCol}"]`);
-        const jumpCell = document.querySelector(`cell[data-row="${jumpRow}"][data-col="${jumpCol}"]`);
+        const jumpCell = document.querySelector(`.cell[data-row="${jumpRow}"][data-col="${jumpCol}"]`);
 
         const middlePiece = middleCell.querySelector(".piece");
         if (
