@@ -114,6 +114,10 @@ function canMoveRegular(piece, startRow, startCol, endRow, endCol, direction) {
   return false;
 }
 
+function canMoveKing(piece, startRow, startCol, endRow, endCol) {
+
+}
+
 function movePiece(piece, targetCell) {
   const startRow = parseInt(piece.parentElement.dataset.row);
   const startCol = parseInt(piece.parentElement.dataset.col);
@@ -135,7 +139,7 @@ function movePiece(piece, targetCell) {
 
   targetCell.appendChild(piece);
 
-  if((piece.dataset.color === "white" && endRow === 0) || (piece.dataset.color === "black" && endRow === 7)){
+  if ((piece.dataset.color === "white" && endRow === 0) || (piece.dataset.color === "black" && endRow === 7)) {
     piece.dataset.king = "true";
     piece.classList.add("king");
   }
@@ -146,8 +150,92 @@ function movePiece(piece, targetCell) {
   checkGameState();
 }
 
-function checkGameState(){
-  return true;
+function checkGameState() {
+  let whiteCount = 0;
+  let blackCount = 0;
+
+  let whiteHasMoves = false;
+  let blackHasMoves = false;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+      const piece = cell.querySelector('.piece');
+
+      if (piece) {
+        if (piece.dataset.color === "white") {
+          whiteCount++;
+          if (!whiteHasMoves && hasValidMoves(piece)) {
+            whiteHasMoves = true;
+          }
+        }
+        else if (piece.dataset.color === "black") {
+          blackCount++;
+          if (!blackHasMoves && hasValidMoves(piece)) {
+            blackHasMoves = true;
+          }
+        }
+      }
+    }
+  }
+
+  if (whiteCount === 0 || !whiteHasMoves) {
+    alert("Черные победили!");
+    disableBoard();
+  } else if (blackCount === 0 || !blackHasMoves) {
+    alert("Белые победили!");
+    disableBoard();
+  }
+}
+
+function isValidPosition(row, col) {
+  return row >= 0 && row < rows && col > 0 && col < cols;
+}
+
+function hasValidMoves(piece) {
+  const startRow = parseInt(piece.parentElement.dataset.row);
+  const startCol = parseInt(piece.parentElement.dataset.col);
+
+  const directions =
+    piece.dataset.king === "true" ? [[1, 1], [1, -1], [-1, 1], [-1, -1]]
+      :
+      piece.dataset.color === "white" ? [[-1, 1], [-1, -1]] : [[1, 1], [1, -1]];
+
+  for (let [dr, dc] of directions) {
+    const newRow = startRow + dr;
+    const newCol = startCol + dc;
+
+    if (isValidPosition(newRow, newCol)) {
+      const targetCell = document.querySelector(`.cell[data-row="${newRow}"][data-col="${newCol}"]`);
+      if (!targetCell.querySelector(".piece")) {
+        return true;
+      }
+
+      const jumpRow = startRow + 2 * dr;
+      const jumpCol = startCol + 2 * dc;
+
+      if (isValidPosition(jumpRow, jumpCol)) {
+        const middleCell = document.querySelector(`.cell[data-row="${newRow}"][data-col="${newCol}"]`);
+        const jumpCell = document.querySelector(`cell[data-row="${jumpRow}"][data-col="${jumpCol}"]`);
+
+        const middlePiece = middleCell.querySelector(".piece");
+        if (
+          middlePiece &&
+          middlePiece.dataset.color !== piece.dataset.color &&
+          !jumpCell.querySelector(".piece")
+        ) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function disableBoard() {
+  document
+    .querySelectorAll(".cell")
+    .forEach((cell) => cell.removeEventListener("click", onCellClick));
 }
 
 initializeBoard();
